@@ -1,0 +1,7 @@
+right hand 
+left hand 
+
+no.of fingers in each hand open 
+total count
+
+api for website
