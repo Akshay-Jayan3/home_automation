@@ -23,24 +23,6 @@ def findHands(img, draw=True):
     return img
 
 
-# def findPossition(img,handNo=0 ,draw=True):
-#     lmList = []
-#     if results.multi_hand_landmarks:
-#         for handLms in results.mul
-#         myHand = results.multi_hand_landmarks[handNo]
-
-#         for id, lm in enumerate(myHand.landmark):
-#             h, w, c = img.shape
-#             cx, cy = int(lm.x*w), int(lm.y*h)
-#             lmList.append([id, cx, cy])
-            
-#             if draw:
-#                 cv2.circle(img, (cx, cy), 7, (255, 0, 0), 
-#                 cv2.FILLED)
-#     return lmList
-
-pTime = 0
-cTime = 0
 tipIds = [4, 8, 12, 16, 20]
 while True:
     success, img = cmp.read()
@@ -48,6 +30,7 @@ while True:
     results = hands.process(imgRGB)
 
     img = findHands(img)
+    up_finger_count = 0
     #lmList = findPossition(img)
     if results.multi_hand_landmarks:
         fingers_1 = []
@@ -62,34 +45,33 @@ while True:
                 lmList.append([id, cx, cy])
             # print(hand_label, lmList)
         
-
             if hand_label == 'Right' and len(lmList) != 0:
 
-                # Thumb
+                
                 if lmList[tipIds[0]][1] < lmList[tipIds[0]-1][1]:
                     fingers_1.append(1)
                     
                 else:
                     fingers_1.append(0)
                     
-                # fingers except thumb
+                
                 for id in range(1, 5):
                     if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]:
                         fingers_1.append(1)
                         
                     else:
                         fingers_1.append(0)   
-                # print('1:', fingers_1)
+                
             if hand_label == 'Left' and len(lmList) != 0:
 
-                # Thumb
+                
                 if lmList[tipIds[0]][1] > lmList[tipIds[0]-1][1]:
                     fingers_2.append(1)
                     
                 else:
                     fingers_2.append(0)
                     
-                # fingers except thumb
+                
                 for id in range(1, 5):
                     if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]:
                         fingers_2.append(1)
@@ -101,34 +83,11 @@ while True:
         # print('1: ', fingers_1)
         # print('2: ', fingers_2)
         finger_list = fingers_1 + fingers_2
-        
+        up_finger_count = finger_list.count(1)
+        # print(up_finger_count)
 
 
-    # if len(lmList) != 0:
-    #     fingers = []
-    #     # Thumb
-    #     if lmList[tipIds[0]][1] > lmList[tipIds[0]-1][1]:
-    #         fingers.append(1)
-    #     else:
-    #         fingers.append(0)
-    #     # fingers except thumb
-    #     for id in range(1, 5):
-    #         if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]:
-    #             fingers.append(1)
-    #         else:
-    #             fingers.append(0)
-    #     print(fingers)
-
-
-
-    # if len(lmList) != 0:
-    #     print(lmList)
-    
-    cTime = time.time()
-    fps = 1/ (cTime-pTime)
-    pTime = cTime
-
-    cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN,
+    cv2.putText(img, str(up_finger_count), (10, 70), cv2.FONT_HERSHEY_PLAIN,
                     3, (255, 8, 255), 3)
 
     cv2.imshow('Image', img)
