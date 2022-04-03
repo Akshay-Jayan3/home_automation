@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import time
-
+from collections import Counter
 
 
 cmp = cv2.VideoCapture(0)
@@ -50,6 +50,8 @@ while True:
     img = findHands(img)
     #lmList = findPossition(img)
     if results.multi_hand_landmarks:
+        fingers_1 = []
+        fingers_2 = []
         for hand_index, hand_info in enumerate(results.multi_handedness):
             hand_label = hand_info.classification[0].label
             myHand = results.multi_hand_landmarks[hand_index]
@@ -58,8 +60,48 @@ while True:
                 h, w, c = img.shape
                 cx, cy = int(lm.x*w), int(lm.y*h)
                 lmList.append([id, cx, cy])
-            print(hand_label, lmList)
+            # print(hand_label, lmList)
+        
 
+            if hand_label == 'Right' and len(lmList) != 0:
+
+                # Thumb
+                if lmList[tipIds[0]][1] < lmList[tipIds[0]-1][1]:
+                    fingers_1.append(1)
+                    
+                else:
+                    fingers_1.append(0)
+                    
+                # fingers except thumb
+                for id in range(1, 5):
+                    if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]:
+                        fingers_1.append(1)
+                        
+                    else:
+                        fingers_1.append(0)   
+                # print('1:', fingers_1)
+            if hand_label == 'Left' and len(lmList) != 0:
+
+                # Thumb
+                if lmList[tipIds[0]][1] > lmList[tipIds[0]-1][1]:
+                    fingers_2.append(1)
+                    
+                else:
+                    fingers_2.append(0)
+                    
+                # fingers except thumb
+                for id in range(1, 5):
+                    if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]:
+                        fingers_2.append(1)
+                        
+                    else:
+                        fingers_2.append(0)
+                # print('2:',fingers_2)
+            
+        # print('1: ', fingers_1)
+        # print('2: ', fingers_2)
+        finger_list = fingers_1 + fingers_2
+        
 
 
     # if len(lmList) != 0:
